@@ -1,0 +1,22 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: health-105-listener
+spec:
+  serviceAccountName: trigger-sa 
+  triggers:
+    - bindings:
+        - ref: health-105-trigger-binding
+      template:
+        ref: health-105-pipeline-template
+      interceptors:
+      - ref:
+          name: gitlab
+          kind: ClusterInterceptor
+        params:
+        - name: "secretRef"
+          value:
+            secretName: gitlab-webhooksecret
+            secretKey: webhook_secret
+        - name: "eventTypes"
+          value: ["Push Hook"]
